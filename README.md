@@ -2,6 +2,8 @@
 
 A custom Home Assistant Community Store (HACS) Integration that monitors your Claude (Anthropic) subscription usage by exposing usage metrics as sensor entities within Home Assistant.
 
+![Claude Usage Monitor Screenshot](assets/screenshot.png)
+
 > **Forked from [trickv/hass-claude-usage](https://github.com/trickv/hass-claude-usage)** — original author: [@trickv](https://github.com/trickv).
 
 ---
