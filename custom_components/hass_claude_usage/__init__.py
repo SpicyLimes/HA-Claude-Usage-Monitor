@@ -105,7 +105,7 @@ class ClaudeUsageCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         refresh_token = self.config_entry.data.get(CONF_REFRESH_TOKEN)
         if not refresh_token:
-            raise UpdateFailed("No refresh token available")
+            raise ConfigEntryAuthFailed("No refresh token available — re-authentication required")
 
         payload = {
             "grant_type": "refresh_token",
@@ -163,7 +163,7 @@ def _parse_usage(raw: dict[str, Any]) -> dict[str, Any]:
                 percent_elapsed = (elapsed / week_seconds) * 100
                 data["week_usage_pace"] = round(utilization - percent_elapsed, 1)
             except (ValueError, TypeError):
-                pass
+                _LOGGER.debug("Could not calculate week_usage_pace: invalid reset_time %r", reset_time)
 
     seven_day_sonnet = raw.get("seven_day_sonnet")
     if seven_day_sonnet:

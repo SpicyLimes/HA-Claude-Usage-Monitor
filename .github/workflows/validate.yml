@@ -2,9 +2,9 @@ name: Validate
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   python-validation:
@@ -60,6 +60,7 @@ jobs:
         with:
           use-quiet-mode: 'yes'
           config-file: '.github/workflows/mlc_config.json'
+          # Note: mlc_config.json lives alongside this file in .github/workflows/
 
   manifest-validation:
     name: Validate Manifest

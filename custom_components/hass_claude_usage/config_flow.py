@@ -53,16 +53,14 @@ class ClaudeUsageConfigFlow(ConfigFlow, domain=DOMAIN):
         self._pkce_challenge: str | None = None
         self._state: str | None = None
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Handle the user OAuth flow - single step."""
-        errors: dict[str, str] = {}
-
-        # Generate PKCE and state on first load
+    def _init_pkce(self) -> None:
+        """Generate PKCE verifier/challenge and state token if not already set."""
         if self._pkce_verifier is None:
             self._pkce_verifier, self._pkce_challenge = generate_pkce()
             self._state = secrets.token_urlsafe(32)
 
-        # Build OAuth URL
+    def _build_oauth_url(self) -> str:
+        """Build the OAuth authorization URL."""
         params = urlencode(
             {
                 "code": "true",
@@ -75,7 +73,14 @@ class ClaudeUsageConfigFlow(ConfigFlow, domain=DOMAIN):
                 "state": self._state,
             }
         )
-        oauth_url = f"{OAUTH_AUTHORIZE_URL}?{params}"
+        return f"{OAUTH_AUTHORIZE_URL}?{params}"
+
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Handle the user OAuth flow - single step."""
+        errors: dict[str, str] = {}
+
+        self._init_pkce()
+        oauth_url = self._build_oauth_url()
 
         if user_input is not None:
             auth_code = user_input.get("auth_code", "").strip()
@@ -136,9 +141,9 @@ class ClaudeUsageConfigFlow(ConfigFlow, domain=DOMAIN):
         auth_code = code_parts[0]
         state = code_parts[1] if len(code_parts) > 1 else ""
 
-        # Validate state parameter to prevent CSRF
-        if state and self._state and state != self._state:
-            _LOGGER.error("OAuth state mismatch - possible CSRF attack")
+        # Validate state parameter to prevent CSRF — always required
+        if not state or state != self._state:
+            _LOGGER.error("OAuth state mismatch or missing - possible CSRF attack")
             return None
 
         payload = {
@@ -215,25 +220,8 @@ class ClaudeUsageConfigFlow(ConfigFlow, domain=DOMAIN):
         """Handle reauth confirmation with new OAuth code."""
         errors: dict[str, str] = {}
 
-        # Generate PKCE and state on first load
-        if self._pkce_verifier is None:
-            self._pkce_verifier, self._pkce_challenge = generate_pkce()
-            self._state = secrets.token_urlsafe(32)
-
-        # Build OAuth URL
-        params = urlencode(
-            {
-                "code": "true",
-                "client_id": OAUTH_CLIENT_ID,
-                "response_type": "code",
-                "redirect_uri": OAUTH_REDIRECT_URI,
-                "scope": OAUTH_SCOPES,
-                "code_challenge": self._pkce_challenge,
-                "code_challenge_method": "S256",
-                "state": self._state,
-            }
-        )
-        oauth_url = f"{OAUTH_AUTHORIZE_URL}?{params}"
+        self._init_pkce()
+        oauth_url = self._build_oauth_url()
 
         if user_input is not None:
             auth_code = user_input.get("auth_code", "").strip()

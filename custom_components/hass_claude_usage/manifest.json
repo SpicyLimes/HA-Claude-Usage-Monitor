@@ -1,11 +1,11 @@
 {
   "domain": "hass_claude_usage",
   "name": "Claude Usage",
-  "codeowners": ["@trickv"],
+  "codeowners": ["@SpicyLimes"],
   "config_flow": true,
-  "documentation": "https://github.com/trickv/hass-claude-usage",
+  "documentation": "https://github.com/SpicyLimes/HA-Claude-Usage-Monitor",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/trickv/hass-claude-usage/issues",
+  "issue_tracker": "https://github.com/SpicyLimes/HA-Claude-Usage-Monitor/issues",
   "requirements": [],
-  "version": "6"
+  "version": "1.0.0"
 }

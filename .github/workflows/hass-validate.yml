@@ -2,9 +2,11 @@ name: Home Assistant Integration Test
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   validate-hacs:
