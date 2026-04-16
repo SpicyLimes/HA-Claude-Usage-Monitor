@@ -82,18 +82,6 @@ Anthropic rate-limits the usage API if polled too frequently. A few dozen reques
 
 ---
 
-## Dashboard
-
-A pre-built Lovelace dashboard is included in the `dashboards/` directory. To use it:
-
-1. Go to **Settings → Dashboards → Add Dashboard**
-2. Click the three-dot menu → **Edit Dashboard**
-3. Click the three-dot menu again → **Raw configuration editor**
-4. Paste the contents of `dashboards/claude_usage.yaml`
-5. Click **Save**
-
----
-
 ## Changes from Original
 
 The following changes were made during a review of the original integration:
