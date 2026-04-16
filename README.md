@@ -4,8 +4,6 @@ A custom Home Assistant Community Store (HACS) Integration that monitors your Cl
 
 > **Forked from [trickv/hass-claude-usage](https://github.com/trickv/hass-claude-usage)** — original author: [@trickv](https://github.com/trickv).
 
-![Claude Usage Monitor Screenshot](assets/screenshot.jpg)
-
 ---
 
 ## Important Notes
