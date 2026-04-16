@@ -4,7 +4,7 @@ A custom Home Assistant Community Store (HACS) Integration that monitors your Cl
 
 > **Forked from [trickv/hass-claude-usage](https://github.com/trickv/hass-claude-usage)** — original author: [@trickv](https://github.com/trickv).
 
-![Claude Usage Monitor Screenshot](screenshot.jpg)
+![Claude Usage Monitor Screenshot](assets/screenshot.jpg)
 
 ---
 
@@ -48,7 +48,7 @@ A custom Home Assistant Community Store (HACS) Integration that monitors your Cl
 
 ### Manual
 
-1. Copy `custom_components/hass_claude_usage/` into your HA `custom_components/` directory
+1. Copy `custom_components/claude_usage_monitor/` into your HA `custom_components/` directory
 2. Restart Home Assistant
 3. Add the integration via **Settings → Devices & Services → Add Integration**
 
@@ -105,9 +105,9 @@ The following changes were made during a review of the original integration:
 
 ```bash
 pip install black isort ruff
-black custom_components/hass_claude_usage/
-isort custom_components/hass_claude_usage/
-ruff check --fix custom_components/hass_claude_usage/
+black custom_components/claude_usage_monitor/
+isort custom_components/claude_usage_monitor/
+ruff check --fix custom_components/claude_usage_monitor/
 ```
 
 ---

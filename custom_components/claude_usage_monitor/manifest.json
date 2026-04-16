@@ -1,5 +1,5 @@
 {
-  "domain": "hass_claude_usage",
+  "domain": "claude_usage_monitor",
   "name": "Claude Usage",
   "codeowners": ["@SpicyLimes"],
   "config_flow": true,
