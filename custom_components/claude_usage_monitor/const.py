@@ -41,14 +41,14 @@ SENSOR_DEFINITIONS = [
     ("week_reset_time", "Weekly Reset Time", None, "mdi:calendar-clock", "timestamp"),
     (
         "week_sonnet_usage_percent",
-        "Weekly Sonnet Usage",
+        "Weekly Model Usage",
         "%",
         "mdi:calendar-week",
         None,
     ),
     (
         "week_sonnet_reset_time",
-        "Weekly Sonnet Reset Time",
+        "Weekly Model Reset Time",
         None,
         "mdi:calendar-clock",
         "timestamp",
@@ -71,3 +71,8 @@ SENSOR_DEFINITIONS = [
     ),
     ("api_error", "API Error", "errors", "mdi:alert-circle", None),
 ]
+
+# Sensor keys that carry extra attributes: {sensor_key: attribute_data_key}
+SENSOR_ATTRIBUTE_KEYS = {
+    "week_sonnet_usage_percent": "week_model_name",
+}

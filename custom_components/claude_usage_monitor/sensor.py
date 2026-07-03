@@ -21,6 +21,7 @@ from .const import (
     CONF_ACCOUNT_NAME,
     CONF_SUBSCRIPTION_LEVEL,
     DOMAIN,
+    SENSOR_ATTRIBUTE_KEYS,
     SENSOR_DEFINITIONS,
 )
 
@@ -59,6 +60,7 @@ class ClaudeUsageSensor(CoordinatorEntity[ClaudeUsageCoordinator], SensorEntity)
         super().__init__(coordinator)
         self._key = key
         self._is_timestamp = device_class == "timestamp"
+        self._attribute_data_key = SENSOR_ATTRIBUTE_KEYS.get(key)
         self._attr_unique_id = f"{entry.entry_id}_{key}"
         self._attr_translation_key = key
         self._attr_name = name
@@ -114,3 +116,13 @@ class ClaudeUsageSensor(CoordinatorEntity[ClaudeUsageCoordinator], SensorEntity)
                 _LOGGER.warning("Invalid timestamp value for %s: %s", self._key, value)
                 return None
         return value
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        """Return additional attributes, if this sensor has any defined."""
+        if self._attribute_data_key is None or self.coordinator.data is None:
+            return None
+        model_name = self.coordinator.data.get(self._attribute_data_key)
+        if model_name is None:
+            return None
+        return {"model": model_name}

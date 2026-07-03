@@ -167,20 +167,56 @@ def _parse_usage(raw: dict[str, Any]) -> dict[str, Any]:
                     "Could not calculate week_usage_pace: invalid reset_time %r", reset_time
                 )
 
-    seven_day_sonnet = raw.get("seven_day_sonnet")
-    if seven_day_sonnet:
-        data["week_sonnet_usage_percent"] = seven_day_sonnet.get("utilization")
-        data["week_sonnet_reset_time"] = seven_day_sonnet.get("resets_at")
+    # Model-specific weekly usage. Anthropic moved this out of the flat
+    # "seven_day_sonnet" field (now always null) into the generic "limits"
+    # array, where the model tracked can be Sonnet, Opus, or any other model
+    # depending on the account's plan and active usage — so surface whichever
+    # "weekly_scoped" entry is present rather than assuming Sonnet.
+    weekly_scoped = next(
+        (
+            limit
+            for limit in raw.get("limits") or []
+            if limit.get("kind") == "weekly_scoped" and limit.get("scope", {}).get("model")
+        ),
+        None,
+    )
+    if weekly_scoped:
+        data["week_sonnet_usage_percent"] = weekly_scoped.get("percent")
+        data["week_sonnet_reset_time"] = weekly_scoped.get("resets_at")
+        data["week_model_name"] = weekly_scoped["scope"]["model"].get("display_name")
+    else:
+        # Fall back to the legacy flat field in case some accounts still use it.
+        seven_day_sonnet = raw.get("seven_day_sonnet")
+        if seven_day_sonnet:
+            data["week_sonnet_usage_percent"] = seven_day_sonnet.get("utilization")
+            data["week_sonnet_reset_time"] = seven_day_sonnet.get("resets_at")
+            data["week_model_name"] = "Sonnet"
 
     extra = raw.get("extra_usage")
-    if extra:
-        data["extra_usage_enabled"] = extra.get("is_enabled", False)
-        data["extra_usage_percent"] = extra.get("utilization")
-        data["extra_usage_credits"] = (
-            extra["used_credits"] / 100 if extra.get("used_credits") is not None else None
-        )
-        data["extra_usage_limit"] = (
-            extra["monthly_limit"] / 100 if extra.get("monthly_limit") is not None else None
-        )
+    spend = raw.get("spend")
+    if extra or spend:
+        enabled = (spend or {}).get("enabled")
+        if enabled is None:
+            enabled = (extra or {}).get("is_enabled", False)
+        data["extra_usage_enabled"] = enabled
+
+        # Anthropic moved the populated credit figures from "extra_usage" into
+        # the new "spend" object ("extra_usage.utilization"/"monthly_limit" are
+        # now always null). Prefer "spend" and fall back to the legacy fields.
+        spend_used = (spend or {}).get("used") or {}
+        used_minor = spend_used.get("amount_minor")
+        if used_minor is None:
+            used_minor = (extra or {}).get("used_credits")
+        data["extra_usage_credits"] = used_minor / 100 if used_minor is not None else None
+
+        limit_minor = (spend or {}).get("limit")
+        if limit_minor is None:
+            limit_minor = (extra or {}).get("monthly_limit")
+        data["extra_usage_limit"] = limit_minor / 100 if limit_minor is not None else None
+
+        percent = (spend or {}).get("percent")
+        if percent is None:
+            percent = (extra or {}).get("utilization")
+        data["extra_usage_percent"] = percent
 
     return data
