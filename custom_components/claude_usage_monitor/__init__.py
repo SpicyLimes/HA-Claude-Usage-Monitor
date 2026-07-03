@@ -216,11 +216,19 @@ def _parse_usage(raw: dict[str, Any]) -> dict[str, Any]:
         # A missing limit means "no cap set" (unlimited) only when extra usage
         # is actually enabled — if it's disabled outright, there's no limit
         # concept to report either way, so leave this as unknown (None).
-        data["extra_usage_unlimited"] = None if not enabled else limit_minor is None
+        is_unlimited = None if not enabled else limit_minor is None
+        data["extra_usage_unlimited"] = is_unlimited
 
-        percent = (spend or {}).get("percent")
-        if percent is None:
-            percent = (extra or {}).get("utilization")
-        data["extra_usage_percent"] = percent
+        # The API hardcodes "spend.percent"/"extra_usage.utilization" to 0 when
+        # there's no limit to divide against — that's not a real "0% used"
+        # reading, so suppress it for unlimited accounts rather than report a
+        # misleading zero.
+        if is_unlimited:
+            data["extra_usage_percent"] = None
+        else:
+            percent = (spend or {}).get("percent")
+            if percent is None:
+                percent = (extra or {}).get("utilization")
+            data["extra_usage_percent"] = percent
 
     return data
