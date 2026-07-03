@@ -69,6 +69,13 @@ SENSOR_DEFINITIONS = [
         "mdi:credit-card-settings",
         None,
     ),
+    (
+        "extra_usage_unlimited",
+        "Unlimited Extra Usage Limit",
+        None,
+        "mdi:infinity",
+        None,
+    ),
     ("api_error", "API Error", "errors", "mdi:alert-circle", None),
 ]
 

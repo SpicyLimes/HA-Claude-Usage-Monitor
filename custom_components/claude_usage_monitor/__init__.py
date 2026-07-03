@@ -213,6 +213,10 @@ def _parse_usage(raw: dict[str, Any]) -> dict[str, Any]:
         if limit_minor is None:
             limit_minor = (extra or {}).get("monthly_limit")
         data["extra_usage_limit"] = limit_minor / 100 if limit_minor is not None else None
+        # A missing limit means "no cap set" (unlimited) only when extra usage
+        # is actually enabled — if it's disabled outright, there's no limit
+        # concept to report either way, so leave this as unknown (None).
+        data["extra_usage_unlimited"] = None if not enabled else limit_minor is None
 
         percent = (spend or {}).get("percent")
         if percent is None:
